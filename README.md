@@ -13,13 +13,22 @@ We will be using Solidity to code the Smart Contracts. Solidity can be locally d
 #### Remix IDE
 https://remix.ethereum.org/
 
+On the Remix IDe page, we need to enable RemixD
+
+To connect Remix IDE with a local Ganache instance, we need to install the NPM library remixd by using the command ```npm i -g @remix-project/remixd```
+
+Then we need to run the command ```remixd -s "C:\ipfs-staging" --remix-ide https://remix.ethereum.org```
+
+Now we need to come to the Remix IDE, compile our contract and deply it to the local Ganache HTTP address.
+
+Once the contract is deployed, we will see a new transaction in Ganache. This will be the first transaction on the blockchain. 
+
 ### Python
 Create a new project using PyCharm Community Edition.
 
 Then we need to install the IPFS modules
 - pip install setuptools wheel
-- pip install ipfs-api
-- pip install ipfshttpclient **
+- pip install ipfshttpclient
 
 We will need to compile the web3 Python modules and need a build tool for that. Please install the Microsoft C++ build tools from https://visualstudio.microsoft.com/visual-cpp-build-tools/
 
@@ -36,7 +45,7 @@ The following optional module is kept on-hold due to breaking changes in the und
 We will run IPFS inside Docker. For that, please download and install Docker Desktop.
 
 Once done, please run the following command to pull the docker image
-```docker pull ipfs/go-ipfs```
+```docker pull ipfs/go-ipfs:v0.8.0```
 
 Once the image is downloaded, we need to start the container. For that, please run the following command
 
@@ -44,7 +53,6 @@ Once the image is downloaded, we need to start the container. For that, please r
 mkdir C:\ipfs-staging
 mkdir C:\ipfs-data
 
-docker run -d --name ipfs_host -v C:\ipfs-staging\export -v C:\ipfs-data\data\ipfs -p 4001:4001 -p 127.0.0.1:8080:8080 -p 127.0.0.1:5001:5001 ipfs/go-ipfs:latest
 docker run -d --name ipfs_host -v C:\ipfs-staging\export -v C:\ipfs-data\data\ipfs -p 4001:4001 -p 127.0.0.1:8080:8080 -p 127.0.0.1:5001:5001 ipfs/go-ipfs:v0.8.0
 ```
 The container is up and running when we see the following in the Docker logs
@@ -73,13 +81,13 @@ The basic level of tasks can be broken down into the following
 |Task|Status|
 | --- | --- |
 |Setup Development Blockchain|Completed|
-|Setup Development IPFS|In-Progress|
+|Setup Development IPFS|Completed|
 |Setup Python|Completed|
 |Setup Python Libraries|In-Progress|
-|Connect Python to Blockchain||
-|Connect Python to IPFS|In-Progress|
-|Develop Smart Contracts||
-|Connect Python to Smart Contracts||
+|Connect Python to Blockchain|In-Progress|
+|Connect Python to IPFS|Completed|
+|Develop Smart Contracts|In-Progress|
+|Connect Python to Smart Contracts|In-Progress|
 |Setup web interface|In-Progress|
 |Develop interconnecting interface||
 |Functional Testing ||
