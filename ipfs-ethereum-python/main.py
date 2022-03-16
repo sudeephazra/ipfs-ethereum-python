@@ -22,8 +22,7 @@ ipfsFile = IPFSFile(str(ipfs_connection['host']), ipfs_connection['port'])
 # Configure Blockchain
 web3_connection = config['BLOCKCHAIN']
 web3_client = Ethereum(str(web3_connection['host']), web3_connection['port'])
-# web3_client.initialize_contract_object(web3_connection['contract_address_2'], web3_connection['abi_2'])
-web3_client.initialize_contract_object(web3_connection['contract_address_3'], web3_connection['abi_3'])
+web3_client.initialize_contract_object(web3_connection['contract_address'], web3_connection['abi'])
 #
 db_connection = config['DATABASE']
 db_client = OffChainDb(str(db_connection['host']), str(db_connection['port']), str(db_connection['database']),

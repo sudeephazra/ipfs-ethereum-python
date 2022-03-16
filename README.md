@@ -8,10 +8,10 @@ Using Python 3.7 to work with IPFS and Ethereum on a Windows 10 machine
 ### Ethereum Blockchain  
 For a local development blockchain, we will use Ganache. This can be downloaded and installed from https://trufflesuite.com/ganache/index.html  
 
-Once Ganache is installed, we will need to create a new Ethereum works[ace with any name of our choice.
+Once Ganache is installed, we will need to create a new Ethereum workspace with any name of our choice.
   
 ### Smart Contracts  
-We will be using Solidity to code the Smart Contracts. Solidity can be locally developed and deployed on the local Ganache Blockchain   
+We will be using Solidity to code the Smart Contracts. Solidity can be locally developed on Remix IDE and deployed on the local Ganache Blockchain   
   
 #### Remix IDE  
 https://remix.ethereum.org/  
@@ -53,7 +53,7 @@ Once done, please run the following command to pull the docker image
 ```docker pull ipfs/go-ipfs:v0.8.0```  
   
 Once the image is downloaded, we need to start the container. For that, please run the following command  
-  ```  
+```  
 mkdir C:\ipfs-staging  
 mkdir C:\ipfs-data  
   
@@ -69,7 +69,7 @@ Daemon is ready
 ```  
 To check the IPFS instance, we need to go to http://localhost:5001/webui and check the status  
   
-Please note: **Now we are accessing the global IPFS network. Any file stored here will be available globally with all the available peers. This is not recommended for confidential data.**  
+Please note: *Now we are accessing the global IPFS network. Any file stored here will be available globally with all the available peers. This is not recommended for confidential data.*  
   
 ### PostgreSQL (Off-chain database)  
   
@@ -78,7 +78,7 @@ We will use Docker to run PostgreSQL. To download the image, please issue the co
 The run the image using the command ```docker run --name postgres-offchain-db -p 5432:5432 -e POSTGRES_PASSWORD=password -d postgres```  
   
 Then create a table as follows  
-```postgres-sql  
+```sql  
 create table data_interoperability (  
 	id serial primary key, 
 	ipfs_hash varchar(255), 
