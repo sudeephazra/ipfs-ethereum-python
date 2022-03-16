@@ -7,13 +7,13 @@ class IPFSFile:
     client = None
 
     def __init__(self, ipfs_host, ipfs_port):
-        print(" Attempting to connect to IPFS at " + str(ipfs_host) + ":" + str(ipfs_port))
+        print("Attempting to connect to IPFS at " + str(ipfs_host) + ":" + str(ipfs_port))
         try:
             self.client = ipfshttpclient.connect(session=True)
         except Exception as ex:
             print("Unable to connect to IPFS. " + str(ex))
         else:
-            print(" Connected to the IPFS endpoint. " + str(ipfs_host) + ":" + str(ipfs_port))
+            print("Connected to the IPFS endpoint. " + str(ipfs_host) + ":" + str(ipfs_port))
 
     # This method accepts a file and then stores it into the IPFS node
     def upload_file_ipfs(self, filename):
@@ -44,7 +44,7 @@ class IPFSFile:
         try:
             json_data = self.client.get_json(json_hash)
         except Exception as ex:
-            print("Unable to store metadata in IPFS")
+            print("Unable to get data from IPFS")
         else:
             self.get_file_ipfs(json_data["file_hash"], json_data["file_name"])
         return None

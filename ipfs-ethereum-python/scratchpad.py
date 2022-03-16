@@ -5,6 +5,7 @@ from Ethereum import Ethereum
 from web3 import Web3
 from tqdm import tqdm
 from time import sleep
+from web3.auto import w3
 
 # ======================= IPFS =======================
 # Get IPFS connection parameters
@@ -44,3 +45,4 @@ from time import sleep
 
 # res = store_var_contract.functions.retrieve().call()
 # print(res)
+

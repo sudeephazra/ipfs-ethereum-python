@@ -2,13 +2,14 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 contract IPFS {
-    string ipfsHash;
 
-    function store(string memory x) public {
-        ipfsHash = x;
+    mapping(uint256 => string) public mappedDocument;
+
+    function store(uint _documentId, string memory _documentHash) public {
+        mappedDocument[_documentId] = _documentHash;
     }
 
-    function retrieve() public view returns (string memory) {
-        return ipfsHash;
+    function retrieve(uint _documentId) public view returns (string memory) {
+        return mappedDocument[_documentId];
     }
 }
