@@ -1,6 +1,5 @@
 #!/usr/bin/python
 from web3 import Web3
-import base58
 import logging
 
 

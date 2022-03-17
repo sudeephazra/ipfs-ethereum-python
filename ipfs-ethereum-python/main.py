@@ -10,7 +10,6 @@ from tabulate import tabulate
 # 3. Upload a file to IPFS and get the hash
 # 4. Initialize a transaction in Blockchain with the hash from the previous step as an input
 # 5. Get the transaction receipt and store it in an OLTP data source
-# 6. To verify the state of the transaction, take the receipt from the OLTP datasource and check status on Blockchain
 
 # Read the configuration file
 config = configparser.ConfigParser()
