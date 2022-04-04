@@ -56,6 +56,7 @@ def get_data(document_id):
 
 @app.route('/api/v1/medication', methods=['POST'])
 def store_data():
+    logging.info("Servicing /api/v1/medication POST request")
     headers = {"Content-Type": "application/json"}
     try:
         if request.is_json:
@@ -68,11 +69,11 @@ def store_data():
     except Exception as ex:
         return make_response(ex, HTTPStatus.INTERNAL_SERVER_ERROR, headers)
     else:
-        return make_response({"transaction_receipt": str(receipt['transactionHash'].hex())}, HTTPStatus.OK, headers)
+        return make_response({"document_id": db_record[0], "transaction_receipt": str(receipt['transactionHash'].hex())}, HTTPStatus.OK, headers)
 
 
 if __name__ == '__main__':
-    app.run()  # run our Flask app
+    app.run(debug=True)  # run our Flask app in development mode
 
 
 
