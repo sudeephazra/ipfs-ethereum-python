@@ -25,6 +25,16 @@ class IPFSFile:
             return result
         return None
 
+    # This method accepts a JSON and then stores it into the IPFS node
+    def upload_json_ipfs(self, json_data):
+        try:
+            result = self.client.add_json(json_data)
+        except Exception as ex:
+            print("Unable to store JSON to IPFS. " + str(ex))
+        else:
+            return result
+        return None
+
     # This method saves a file into IPFS and then creates an hash to store the file metadata into IPFS
     def store_data(self, filename):
         ipfs_details = self.upload_file_ipfs(filename)
@@ -40,6 +50,15 @@ class IPFSFile:
             return result
         return None
 
+    def store_json(self, json_data):
+        try:
+            ipfs_details = self.upload_json_ipfs(json_data)
+        except Exception as ex:
+            print("Unable to store metadata in IPFS")
+        else:
+            return ipfs_details
+        return None
+
     def get_data(self, json_hash):
         try:
             json_data = self.client.get_json(json_hash)
@@ -47,6 +66,15 @@ class IPFSFile:
             print("Unable to get data from IPFS")
         else:
             self.get_file_ipfs(json_data["file_hash"], json_data["file_name"])
+        return None
+
+    def get_json(self, json_hash):
+        try:
+            json_data = self.client.get_json(json_hash)
+        except Exception as ex:
+            print("Unable to get data from IPFS")
+        else:
+            return json_data
         return None
 
     # This method retrieves the data for a given file hash and saves it as a give file
