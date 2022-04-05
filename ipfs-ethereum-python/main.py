@@ -38,9 +38,9 @@ db_client = OffChainDb(str(db_connection['host']), str(db_connection['port']), s
                        str(db_connection['user']), str(db_connection['password']))
 
 
-@app.route('/api/v1/medication/<int:document_id>', methods=['GET'])
+@app.route('/api/v1/medicationstatement/<int:document_id>', methods=['GET'])
 def get_data(document_id):
-    logging.info("Servicing /medication/<document_id> GET request for document " + str(document_id))
+    logging.info("Servicing /medicationstatement/<document_id> GET request for document " + str(document_id))
     headers = {"Content-Type": "application/json"}
     try:
         ipfs_file_hash = web3_client.retrieve_data(document_id)
@@ -54,9 +54,9 @@ def get_data(document_id):
         return make_response({'data': json_data}, HTTPStatus.OK, headers)
 
 
-@app.route('/api/v1/medication', methods=['POST'])
+@app.route('/api/v1/medicationstatement', methods=['POST'])
 def store_data():
-    logging.info("Servicing /api/v1/medication POST request")
+    logging.info("Servicing /api/v1/medicationstatement POST request")
     headers = {"Content-Type": "application/json"}
     try:
         if request.is_json:

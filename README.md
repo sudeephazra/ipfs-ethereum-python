@@ -86,6 +86,47 @@ create table data_interoperability (
 );  
 ```  
   
+## Process Flow
+
+The primary data flow can be summarized as below
+
+*CDR is not in scope for this document and needs to be looked at separately.*
+
+### POST Request
+![](docs/images/post_request.png)
+1. A transaction is initiated from any user of the system to store data. An optional can be used to convert data into FHIR format
+2. The data is stored in the IPFS node and a hash is generated corresponding to the data
+3. This hash is intercepted by the Python API 
+4. A transaction is sent to the Smart Contract 
+5. The Smart Contract returns a transaction receipt for the transaction
+
+*N.B.* - All interactions between the IPFS and Blockchain are stored in an off-chain PostgreSQL database
+
+Example:
+#### Request Body
+- data – A string version of the FHIR compliant entity (medication/allergy, or anything else) 
+- account – The account number of the party initiating the transaction
+#### Response Body
+- document_id – The off-chain document ID
+- transaction_receipt – The transaction hash of the data store operation in Blockchain
+
+![](docs/images/sample_post.png)
+ 
+### GET Request
+![](docs/images/get_request.png)
+1. Any user submits a equest to retrieve data from the Blockchain using an identifier
+2. The request is redirected to the Smart Contract
+3. The relevant data hash is extracted from the Blockchain
+4. The data corresponding to this hash os retrieved from IPFS
+5. The data is sent back to the Python API
+6. The JSON data from IPFS is sent back to the user
+
+Example:
+#### Response Body
+- data – The formatted JSON data from IPFS
+
+![](docs/images/sample_get.png)
+
 ## Development  
 We need to be able to do the following  
 - Accept a file and add it to IPFS  
@@ -106,12 +147,11 @@ The basic level of tasks can be broken down into the following
 |Connect Python to IPFS|Completed|  
 |Develop Smart Contracts|Completed|  
 |Connect Python to Smart Contracts|Completed|  
-|Setup web interface|In-Progress|  
-|Develop interconnecting interface|In-Progress|  
-|Functional Testing |In-Progress|  
-|Non-functional Testing|In-Progress|  
-|Documentation|In-Progress|  
-  
+|Setup web interface|Completed|  
+|Develop interconnecting interface|Completed|  
+|Functional Testing |Completed|  
+|Documentation|Completed|
+
   
 ## Resources  
   
