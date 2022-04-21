@@ -3,7 +3,6 @@ import configparser
 from IPFSFile import IPFSFile
 from Ethereum import Ethereum
 from OffChainDb import OffChainDb
-from tabulate import tabulate
 from flask import Flask, request, make_response
 from flask_restful import Api
 import json
