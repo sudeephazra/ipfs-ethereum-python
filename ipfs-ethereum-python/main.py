@@ -37,38 +37,76 @@ db_client = OffChainDb(str(db_connection['host']), str(db_connection['port']), s
                        str(db_connection['user']), str(db_connection['password']))
 
 
-@app.route('/api/v1/medicationstatement/<int:document_id>', methods=['GET'])
-def get_data(document_id):
-    logging.info("Servicing /medicationstatement/<document_id> GET request for document " + str(document_id))
-    headers = {"Content-Type": "application/json"}
-    try:
-        ipfs_file_hash = web3_client.retrieve_data(document_id)
-        if ipfs_file_hash is None:
-            return make_response('No data found', HTTPStatus.NO_CONTENT, headers)
-        else:
-            json_data = json.loads(ipfsFile.get_json(ipfs_file_hash))
-    except Exception as ex:
-        return make_response(ex, HTTPStatus.INTERNAL_SERVER_ERROR, headers)
-    else:
-        return make_response({'data': json_data}, HTTPStatus.OK, headers)
-
-
-@app.route('/api/v1/medicationstatement', methods=['POST'])
-def store_data():
-    logging.info("Servicing /api/v1/medicationstatement POST request")
+@app.route('/api/v1/medications', methods=['GET'])
+def get_all_data():
+    logging.info("Servicing /medications GET request for address")
     headers = {"Content-Type": "application/json"}
     try:
         if request.is_json:
-            medication_data = request.get_json()
-            ipfs_hash = ipfsFile.store_json(medication_data["data"])
-            db_client.store_new_document(ipfs_hash)
-            db_record = db_client.get_document_from_ipfshash(ipfs_hash)
-            receipt = web3_client.store_data(db_record[0], ipfs_hash, medication_data["account"])
-            db_client.update_transaction_for_document(db_record[0], str(receipt['transactionHash'].hex()))
+            request_data = request.get_json()
+            account_id = request_data["account_id"]
+            all_documents = web3_client.get_all_documents_for_account(str(account_id))
+            if all_documents is None:
+                return make_response('No data found', HTTPStatus.NO_CONTENT, headers)
+        else:
+            return make_response('Invalid input. JSON input expected', HTTPStatus.BAD_REQUEST, headers)
     except Exception as ex:
         return make_response(ex, HTTPStatus.INTERNAL_SERVER_ERROR, headers)
     else:
-        return make_response({"document_id": db_record[0], "transaction_receipt": str(receipt['transactionHash'].hex())}, HTTPStatus.OK, headers)
+        return make_response({'data': all_documents}, HTTPStatus.OK, headers)
+
+
+@app.route('/api/v1/medication/<int:document_id>', methods=['GET'])
+def get_data(document_id):
+    logging.info("Servicing /medication/<document_id> GET request for document ")
+    headers = {"Content-Type": "application/json"}
+    try:
+        if request.is_json:
+            request_data = request.get_json()
+            account_id = request_data["account_id"]
+            document = web3_client.get_document(document_id, account_id)
+            if document is None:
+                return make_response('No data found', HTTPStatus.NO_CONTENT, headers)
+        else:
+            return make_response('Invalid input. JSON input expected', HTTPStatus.BAD_REQUEST, headers)
+    except Exception as ex:
+        return make_response(ex, HTTPStatus.INTERNAL_SERVER_ERROR, headers)
+
+
+@app.route('/api/v1/medication', methods=['POST'])
+def store_data():
+    logging.info("Servicing /api/v1/medication POST request")
+    headers = {"Content-Type": "application/json"}
+    try:
+        if request.is_json:
+            data = request.get_json()
+            creator = data["creator_account"]
+            owner = data["owner_account"]
+            ipfs_hash = ipfsFile.store_json(data["fileBase64"])
+            receipt = web3_client.store_data(ipfs_hash, creator, owner)
+    except Exception as ex:
+        return make_response(ex, HTTPStatus.INTERNAL_SERVER_ERROR, headers)
+    else:
+        # return make_response({"transaction_receipt": str(receipt['transactionHash'].hex())}, HTTPStatus.OK, headers)
+        return make_response({"transaction_receipt": str(receipt)}, HTTPStatus.OK, headers)
+
+
+@app.route('/api/v1/medication/permissions', methods=['POST'])
+def allow_read():
+    logging.info("Servicing /api/v1/permissions POST request")
+    headers = {"Content-Type": "application/json"}
+    try:
+        if request.is_json:
+            data = request.get_json()
+            document = data["document_id"]
+            requestor = data["requestor_account"]
+            owner = data["owner_account"]
+            receipt = web3_client.grant_permission(int(document), requestor, owner)
+    except Exception as ex:
+        return make_response(ex, HTTPStatus.INTERNAL_SERVER_ERROR, headers)
+    else:
+        # return make_response({"transaction_receipt": str(receipt['transactionHash'].hex())}, HTTPStatus.OK, headers)
+        return make_response({"transaction_receipt": str(receipt)}, HTTPStatus.OK, headers)
 
 
 if __name__ == '__main__':
