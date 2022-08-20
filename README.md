@@ -99,7 +99,7 @@ Content-Length: 918
     "owner_account": "0x589B94e83A2345f33eaF34567be1c465D71870ef"
 }
 ```
-#### Sample Response
+#### Sample Response Body
 ```
 {
     "transaction_receipt": "AttributeDict(
@@ -139,7 +139,7 @@ Content-Length: 68
     "account_id": "0x31E4b4Fc78ADEacDF0D92B52DBd43Fd1fc102d57"
 }
 ```
-#### Sample Response
+#### Sample Response Body
 ```
 {
     "data": [
@@ -155,6 +155,9 @@ Content-Length: 68
 }
 ```
 
+#### Errors
+You will get a 403 FORBIDDEN response if the user account does not have permissions to read the document.
+
 
 ### GET Request (All Documents)
 
@@ -169,7 +172,7 @@ Content-Length: 68
     "account_id": "0x589B94e83A2345f33eaF34567be1c465D71870ef"
 }
 ```
-#### Sample Response
+#### Sample Response Body
 ```
 {
     "data": [

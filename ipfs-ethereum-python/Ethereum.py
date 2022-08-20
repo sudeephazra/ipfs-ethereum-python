@@ -76,8 +76,10 @@ class Ethereum:
         logging.info("Attempting to retrieve data")
         if self.contract_object:
             try:
-                requesting_account = Web3.toChecksumAddress(requestor)
-                result = self.contract_object.functions.getDocument(int(document_id)).call()
+                if self.is_reader(requestor, document_id):
+                    result = self.contract_object.functions.getDocument(int(document_id)).call()
+                else:
+                    return 403
             except Exception as ex:
                 logging.error("Unable to retrieve the value from the Blockchain: " + str(ex))
                 return ex
@@ -87,15 +89,24 @@ class Ethereum:
         else:
             logging.error("No contract initialized. Please run initialize_contract_object() before calling any operation")
 
-
     def grant_permission(self, account, document_id, from_account):
         logging.info("Granting permission to " + str(account) + " to document ID " + str(document_id))
         if self.contract_object:
-            requestor_account = Web3.toChecksumAddress(account)
-            tx_hash = self.contract_object.functions.grant_view(int(document_id), requestor_account).transact({'from': from_account})
-            receipt = self.web3_client.eth.wait_for_transaction_receipt(tx_hash)
-            logging.info("Transaction submitted and receipt provided")
-            return receipt
+            try:
+                if self.is_owner(from_account, document_id):
+                    requestor_account = Web3.toChecksumAddress(account)
+                    tx_hash = self.contract_object.functions.grant_view(int(document_id), requestor_account).transact(
+                        {'from': from_account})
+                    receipt = self.web3_client.eth.wait_for_transaction_receipt(tx_hash)
+                    logging.info("Transaction submitted and receipt provided")
+                else:
+                    return 403
+            except Exception as ex:
+                logging.error("Unable to retrieve the value from the Blockchain: " + str(ex))
+                return ex
+            else:
+                logging.info("Received value from the Blockchain")
+                return receipt
         else:
             logging.error("No contract initialized. Please run initialize_contract_object() before calling any operation")
 
@@ -110,3 +121,34 @@ class Ethereum:
             logging.error("No transaction data found")
             return None
 
+    def is_owner(self, account, document_id):
+        logging.info("Checking ownership of " + str(account) + " for document ID " + str(document_id))
+        if self.contract_object:
+            try:
+                requestor_account = Web3.toChecksumAddress(account)
+                is_owner = self.contract_object.functions.check_if_owner(int(document_id), requestor_account).call()
+                logging.info("Transaction submitted and receipt provided")
+            except Exception as ex:
+                logging.error("Unable to retrieve the value from the Blockchain: " + str(ex))
+                return ex
+            else:
+                logging.info("Received value from the Blockchain")
+                return is_owner
+        else:
+            logging.error("No contract initialized. Please run initialize_contract_object() before calling any operation")
+
+    def is_reader(self, account, document_id):
+        logging.info("Checking ownership of " + str(account) + " for document ID " + str(document_id))
+        if self.contract_object:
+            try:
+                requestor_account = Web3.toChecksumAddress(account)
+                is_reader = self.contract_object.functions.check_if_reader(int(document_id), requestor_account).call()
+                logging.info("Transaction submitted and receipt provided")
+            except Exception as ex:
+                logging.error("Unable to retrieve the value from the Blockchain: " + str(ex))
+                return ex
+            else:
+                logging.info("Received value from the Blockchain")
+                return is_reader
+        else:
+            logging.error("No contract initialized. Please run initialize_contract_object() before calling any operation")

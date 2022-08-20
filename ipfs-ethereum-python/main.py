@@ -67,6 +67,8 @@ def get_data(document_id):
             document = web3_client.get_document(document_id, account_id)
             if document is None:
                 return make_response('No data found', HTTPStatus.NO_CONTENT, headers)
+            if document == 403:
+                return make_response('{"error": "Account does not have permissions to read this record"}', HTTPStatus.FORBIDDEN, headers)
         else:
             return make_response('Invalid input. JSON input expected', HTTPStatus.BAD_REQUEST, headers)
     except Exception as ex:
@@ -93,17 +95,18 @@ def store_data():
         return make_response({"transaction_receipt": str(receipt)}, HTTPStatus.OK, headers)
 
 
-@app.route('/api/v1/medication/permissions', methods=['POST'])
-def allow_read():
+@app.route('/api/v1/medication/grantpermission/<int:document_id>', methods=['POST'])
+def grant_read(document_id):
     logging.info("Servicing /api/v1/permissions POST request")
     headers = {"Content-Type": "application/json"}
     try:
         if request.is_json:
             data = request.get_json()
-            document = data["document_id"]
             requestor = data["requestor_account"]
             owner = data["owner_account"]
-            receipt = web3_client.grant_permission(int(document), requestor, owner)
+            receipt = web3_client.grant_permission(requestor, int(document_id), owner)
+            if receipt == 403:
+                return make_response('{"error": "Only document owners can grant permissions"}', HTTPStatus.FORBIDDEN, headers)
     except Exception as ex:
         return make_response(ex, HTTPStatus.INTERNAL_SERVER_ERROR, headers)
     else:

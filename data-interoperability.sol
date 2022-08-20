@@ -11,6 +11,8 @@ contract DataInteroperability {
         address[] _documentReaders;
     }
 
+    event DocumentCreated(address indexed owner, Document document);
+
     Document[] public _documents;
     mapping(uint256 => Document) public mappedDocument;
     mapping(address => Document[]) public ownedDocuments;
@@ -29,21 +31,21 @@ contract DataInteroperability {
 
         _documents.push(mappedDocument[_id]);
 
+        emit DocumentCreated(msg.sender, mappedDocument[_id]);
+    }
+
+    function grant_view(uint256 _documentId, address _requestor) public returns (Document memory) {
+        mappedDocument[_documentId]._documentReaders.push(_requestor);
+        return mappedDocument[_documentId];
+
     }
 
     function getDocument(uint _documentId) public view returns (Document memory) {
-        require(check_if_reader(_documentId, msg.sender) == true, "You dont have permissions to view the record");
         return mappedDocument[_documentId];
     }
 
     function getAllDocument(address _owner) public view returns (Document[] memory) {
         return ownedDocuments[_owner];
-    }
-
-    function grant_view(uint256 _documentId, address _requestor) public {
-        require(mappedDocument[_documentId]._documentOwner == msg.sender, "Only owner can grant permissions");
-
-        mappedDocument[_documentId]._documentReaders.push(_requestor);
     }
 
     function check_if_reader(uint256 _documentId, address _requestor) public view returns(bool) {
@@ -54,8 +56,16 @@ contract DataInteroperability {
                 isReader = true;
             }
         }
-
         return isReader;
+    }
+
+    function check_if_owner(uint256 _documentId, address _requestor) public view returns(bool) {
+        address _owner = mappedDocument[_documentId]._documentOwner;
+        bool isOwner = false;
+        if (_requestor == _owner) {
+            isOwner = true;
+        }
+        return isOwner;
     }
 
 }
