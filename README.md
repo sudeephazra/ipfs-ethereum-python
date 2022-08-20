@@ -71,21 +71,6 @@ To check the IPFS instance, we need to go to http://localhost:5001/webui and che
   
 Please note: *Now we are accessing the global IPFS network. Any file stored here will be available globally with all the available peers. This is not recommended for confidential data.*  
   
-### PostgreSQL (Off-chain database)  
-  
-We will use Docker to run PostgreSQL. To download the image, please issue the command ```docker pull postgres```  
-  
-The run the image using the command ```docker run --name postgres-offchain-db -p 5432:5432 -e POSTGRES_PASSWORD=password -d postgres```  
-  
-Then create a table as follows  
-```sql  
-create table data_interoperability (  
-	id serial primary key, 
-	ipfs_hash varchar(255), 
-	transaction_hash varchar(255)
-);  
-```  
-  
 ## Process Flow
 
 The primary data flow can be summarized as below
@@ -93,7 +78,6 @@ The primary data flow can be summarized as below
 *CDR is not in scope for this document and needs to be looked at separately.*
 
 ### POST Request
-![](docs/images/post_request.png)
 1. A transaction is initiated from any user of the system to store data. An optional can be used to convert data into FHIR format
 2. The data is stored in the IPFS node and a hash is generated corresponding to the data
 3. This hash is intercepted by the Python API 
@@ -102,55 +86,119 @@ The primary data flow can be summarized as below
 
 *N.B.* - All interactions between the IPFS and Blockchain are stored in an off-chain PostgreSQL database
 
-Example:
-#### Request Body
-- data – A string version of the FHIR compliant entity (medication/allergy, or anything else) 
-- account – The account number of the party initiating the transaction
-#### Response Body
-- document_id – The off-chain document ID
-- transaction_receipt – The transaction hash of the data store operation in Blockchain
+#### Sample Request
+```
+POST /api/v1/medication HTTP/1.1
+Host: localhost:5000
+Content-Type: application/json
+Content-Length: 918
 
-![](docs/images/sample_post.png)
- 
-### GET Request
-![](docs/images/get_request.png)
-1. Any user submits a equest to retrieve data from the Blockchain using an identifier
+{
+    "fileBase64": "data:@file/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAYFBMVEWAgID///97e3vCwsL4+Pitra2QkJDMzMx5eXnl5eWLi4t9fX3IyMh2dnbPz8/V1dXw8PDc3Nzj4+P19fWEhITs7OydnZ2jo6OUlJSwsLC4uLiurq6+vr6ZmZmSkpKhoaE0a0TUAAAGzUlEQVR4nO3dWXuiMBQG4CRCjYRVQNRq+///5QT3BXJOUCdL893MTRnzPkCArIQqEx1Sl2XZyiz7VIcUl+THzNP7zDTzcHiaX3P9reNvy0Is+uLIUh3LpySQIdZi1+3XX0nSNESw7D58JOzdGfshmfsCMdI0ydfXvpsthqzPwmWXcCZkiEvpC8x4smlBYb7mbtHuIhj7XSqFyyRz2HeIyH7LUWH9zVz39REkHxGWCTNduDeFbwaFlWN1iyr8d0BY+HICD2Gr6FFY+XMCD2GrB+HCM6Ak/t4J68Y74aW6OQp/vboJT+H5VZhy06X5SJryLIz8u0QPEd1ZuPHxGu2TLY/C0tNTKE/i6iic+XoK5SOjPQi/vD2HhH33wsrPivSYJJLCjb+nUD4TKylsTJfik2E7SqrMdCk+GVmbEo9rUhmR+C4kjfdCEvkuFN4LuffCLAidT1YGoevJ2iB0PX9AuAzCwYhT3l+gt4dPEAqRrLo4jrvVVyOsvwB4pSsUYlVcOq7qattYbtQVChEv7jrJaTSzu1NHUyiSnD6l7Wwm6gnZ6nm0Sp",
+    "creator_account": "0x31E4b4Fc78ADEacDF0D92B52DBd43Fd1fc102d57",
+    "owner_account": "0x589B94e83A2345f33eaF34567be1c465D71870ef"
+}
+```
+#### Sample Response
+```
+{
+    "transaction_receipt": "AttributeDict(
+      {
+        'transactionHash': HexBytes('0x15c0712216947d677b210dc18a399274ddc40e88afd09ec94e6744700635e090'), 
+        'transactionIndex': 0, 
+        'blockHash': HexBytes('0x09482b831e9d05b2f365872de7034af198a97214aad4ca86b4c7378f71d4c980'), 
+        'blockNumber': 92, 'from': '0x589B94e83A2345f33eaF34567be1c465D71870ef', 
+        'to': '0xF381d0b5F150CD8B18b19Adac1C7798E7185fe4C', 
+        'gasUsed': 605973, 
+        'cumulativeGasUsed': 605973, 
+        'contractAddress': None, 
+        'logs': [], 
+        'status': 1, 
+        'logsBloom': HexBytes('0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000')
+      }
+    )"
+}
+```
+
+### GET Request (Individual Document)
+1. Any user submits a request to retrieve data from the Blockchain using an identifier
 2. The request is redirected to the Smart Contract
 3. The relevant data hash is extracted from the Blockchain
 4. The data corresponding to this hash os retrieved from IPFS
 5. The data is sent back to the Python API
 6. The JSON data from IPFS is sent back to the user
 
-Example:
-#### Response Body
-- data – The formatted JSON data from IPFS
+#### Sample Request 
+```
+GET /api/v1/medication/2 HTTP/1.1
+Host: localhost:5000
+Content-Type: application/json
+Content-Length: 68
 
-![](docs/images/sample_get.png)
+{
+    "account_id": "0x31E4b4Fc78ADEacDF0D92B52DBd43Fd1fc102d57"
+}
+```
+#### Sample Response
+```
+{
+    "data": [
+        2,
+        "QmSaqh7sEyj3rCiECEza4twh56RLqdygiX4imuSajiE7tq",
+        "0x589B94e83A2345f33eaF34567be1c465D71870ef",
+        1660984960,
+        [
+            "0x589B94e83A2345f33eaF34567be1c465D71870ef",
+            "0x31E4b4Fc78ADEacDF0D92B52DBd43Fd1fc102d57"
+        ]
+    ]
+}
+```
 
-## Development  
-We need to be able to do the following  
-- Accept a file and add it to IPFS  
-  - Add the hash of the file to the Blockchain  
-- Retrieve the hash of a file from the Blockchain  
-  - Retrieve the file from IPFS  
 
-  
-The basic level of tasks can be broken down into the following  
-  
-|Task|Status|  
-| --- | --- |  
-|Setup Development Blockchain|Completed|  
-|Setup Development IPFS|Completed|  
-|Setup Python|Completed|  
-|Setup Python Libraries|Completed|  
-|Connect Python to Blockchain|Completed|  
-|Connect Python to IPFS|Completed|  
-|Develop Smart Contracts|Completed|  
-|Connect Python to Smart Contracts|Completed|  
-|Setup web interface|Completed|  
-|Develop interconnecting interface|Completed|  
-|Functional Testing |Completed|  
-|Documentation|Completed|
+### GET Request (All Documents)
+
+#### Sample Request 
+```
+GET /api/v1/medications HTTP/1.1
+Host: localhost:5000
+Content-Type: application/json
+Content-Length: 68
+
+{
+    "account_id": "0x589B94e83A2345f33eaF34567be1c465D71870ef"
+}
+```
+#### Sample Response
+```
+{
+    "data": [
+        [
+            1,
+            "QmYiJpPZ2ySmRmdY2EVXeEsQbtCjrq375EFPMTnRLqU4k8",
+            "0x589B94e83A2345f33eaF34567be1c465D71870ef",
+            1660915072,
+            [
+                "0x589B94e83A2345f33eaF34567be1c465D71870ef",
+                "0x31E4b4Fc78ADEacDF0D92B52DBd43Fd1fc102d57"
+            ]
+        ],
+        [
+            2,
+            "QmSaqh7sEyj3rCiECEza4twh56RLqdygiX4imuSajiE7tq",
+            "0x589B94e83A2345f33eaF34567be1c465D71870ef",
+            1660915485,
+            [
+                "0x589B94e83A2345f33eaF34567be1c465D71870ef",
+                "0x31E4b4Fc78ADEacDF0D92B52DBd43Fd1fc102d57"
+            ]
+        ]
+    ]
+}
+```
+
+
+
 
   
 ## Resources  

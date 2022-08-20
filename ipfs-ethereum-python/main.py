@@ -70,7 +70,9 @@ def get_data(document_id):
         else:
             return make_response('Invalid input. JSON input expected', HTTPStatus.BAD_REQUEST, headers)
     except Exception as ex:
-        return make_response(ex, HTTPStatus.INTERNAL_SERVER_ERROR, headers)
+        return make_response(ex, HTTPStatus.PRECONDITION_FAILED, headers)
+    else:
+        return make_response({'data': document}, HTTPStatus.OK, headers)
 
 
 @app.route('/api/v1/medication', methods=['POST'])

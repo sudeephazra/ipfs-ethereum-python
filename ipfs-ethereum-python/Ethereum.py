@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from web3 import Web3
 import logging
-
+import json
 
 class Ethereum:
 
@@ -77,14 +77,16 @@ class Ethereum:
         if self.contract_object:
             try:
                 requesting_account = Web3.toChecksumAddress(requestor)
-                result = self.contract_object.functions.getDocument(int(document_id)).call({'from': requesting_account})
+                result = self.contract_object.functions.getDocument(int(document_id)).call()
             except Exception as ex:
                 logging.error("Unable to retrieve the value from the Blockchain: " + str(ex))
+                return ex
             else:
                 logging.info("Received value from the Blockchain")
                 return result
         else:
             logging.error("No contract initialized. Please run initialize_contract_object() before calling any operation")
+
 
     def grant_permission(self, account, document_id, from_account):
         logging.info("Granting permission to " + str(account) + " to document ID " + str(document_id))
