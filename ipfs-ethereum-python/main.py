@@ -65,6 +65,8 @@ def get_data(document_id):
             request_data = request.get_json()
             account_id = request_data["account_id"]
             document = web3_client.get_document(document_id, account_id)
+            ipfs_data = ipfsFile.get_data_ipfs(document[1])
+            print(ipfs_data)
             if document is None:
                 return make_response('No data found', HTTPStatus.NO_CONTENT, headers)
             if document == 403:
@@ -74,7 +76,7 @@ def get_data(document_id):
     except Exception as ex:
         return make_response(ex, HTTPStatus.PRECONDITION_FAILED, headers)
     else:
-        return make_response({'data': document}, HTTPStatus.OK, headers)
+        return make_response({'data': document, 'content': ipfs_data}, HTTPStatus.OK, headers)
 
 
 @app.route('/api/v1/medication', methods=['POST'])

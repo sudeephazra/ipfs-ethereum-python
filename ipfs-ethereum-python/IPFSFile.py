@@ -88,3 +88,13 @@ class IPFSFile:
             f.write(result)
             f.close()
         return None
+
+    def get_data_ipfs(self, file_hash):
+        try:
+            result = self.client.cat(str(file_hash))
+            # result = file_hash
+        except Exception as ex:
+            print("Unable to get file from IPFS. " + str(ex))
+        else:
+            return result.decode('utf8', 'strict')
+        return None
