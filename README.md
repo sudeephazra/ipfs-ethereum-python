@@ -130,7 +130,7 @@ Content-Length: 918
 
 #### Sample Request 
 ```
-GET /api/v1/medication/2 HTTP/1.1
+GET /api/v1/medication/7 HTTP/1.1
 Host: localhost:5000
 Content-Type: application/json
 Content-Length: 68
@@ -142,11 +142,12 @@ Content-Length: 68
 #### Sample Response Body
 ```
 {
+    "content": "\"Hello World\"",
     "data": [
-        2,
-        "QmSaqh7sEyj3rCiECEza4twh56RLqdygiX4imuSajiE7tq",
+        7,
+        "QmSXfamUcvkEyYbtGdQdwZ4TrnVbneKrY5zNx7eGV5ckyq",
         "0x589B94e83A2345f33eaF34567be1c465D71870ef",
-        1660984960,
+        1661083172,
         [
             "0x589B94e83A2345f33eaF34567be1c465D71870ef",
             "0x31E4b4Fc78ADEacDF0D92B52DBd43Fd1fc102d57"
