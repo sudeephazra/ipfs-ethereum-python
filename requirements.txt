@@ -7,7 +7,7 @@ attrs==21.4.0
 backcall==0.2.0
 bitarray==1.2.2
 cached-property==1.5.2
-certifi==2022.12.07
+certifi==2023.7.22
 charset-normalizer==2.0.12
 click==8.0.4
 colorama==0.4.4
